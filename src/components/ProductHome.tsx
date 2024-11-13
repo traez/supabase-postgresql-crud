@@ -1,0 +1,134 @@
+"use client";
+import { useState, useEffect } from "react";
+import ProductCard from "./ProductCard";
+//import { supabase } from './supabaseClient'
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export default function ProductHome() {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+
+  console.log(name, description);
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  async function getProducts() {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .limit(10);
+      if (error) throw error;
+      if (data != null) {
+        setProducts(data);
+      }
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      alert(errorMessage);
+    }
+  }
+
+  async function createProduct() {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .insert({
+          name: name,
+          description: description,
+        })
+        .single();
+
+      if (error) throw error;
+      window.location.reload();
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      alert(errorMessage);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex-shrink-0 flex items-center">
+              <span className="text-xl font-bold">Store Products</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-sm text-gray-500">
+                Created by Cooper Codes
+              </span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="mb-8">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+              Create Product For Supabase Database
+            </h3>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Product Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Product Description
+                </label>
+                <input
+                  type="text"
+                  id="description"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={() => createProduct()}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Create Product in Supabase DB
+              </button>
+            </div>
+          </div>
+
+          <hr className="my-8" />
+
+          <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+            Current Database Items
+          </h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
