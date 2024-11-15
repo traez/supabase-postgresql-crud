@@ -1,45 +1,49 @@
-import React, { useState } from "react";
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-}
+import { useState } from "react";
+import { toast } from "sonner";
+import { DataTypeProduct } from "@/lib/dataProduct";
+import { supabase } from "@/lib/supabaseClient";
 
 interface ProductCardProps {
-  product: Product;
+  product: DataTypeProduct;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
 
   async function updateProduct() {
     try {
-      console.log("Updating product:", { id: product.id, name, description });
-      // Implement your Supabase update logic here
+      const { error } = await supabase
+        .from("products")
+        .update({
+          name: name,
+          description: description,
+        })
+        .eq("id", product.id);
+
+      if (error) throw error;
+      toast.success("Product updated successfully!");
       window.location.reload();
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("An unexpected error occurred");
-      }
+      const errorMessage = (error as Error).message;
+      toast.error(`Error updating product: ${errorMessage}`);
     }
   }
 
   async function deleteProduct() {
     try {
-      console.log("Deleting product:", product.id);
-      // Implement your Supabase delete logic here
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", product.id);
+
+      if (error) throw error;
+      toast.success("Product deleted successfully!");
       window.location.reload();
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("An unexpected error occurred");
-      }
+      const errorMessage = (error as Error).message;
+      toast.error(`Error deleting product: ${errorMessage}`);
     }
   }
 

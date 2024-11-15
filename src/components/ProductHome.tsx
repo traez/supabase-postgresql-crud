@@ -1,31 +1,28 @@
 "use client";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import ProductCard from "./ProductCard";
-//import { supabase } from './supabaseClient'
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-}
+import { supabase } from "@/lib/supabaseClient";
+import { DataTypeProduct } from "@/lib/dataProduct";
+//import { DataTypeProduct, arrayProduct } from "@/lib/dataProduct";
 
 export default function ProductHome() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<DataTypeProduct[]>([]);
+  //const [products, setProducts] = useState<DataTypeProduct[]>(arrayProduct);
 
   console.log(name, description);
 
   useEffect(() => {
     getProducts();
+    //setProducts(arrayProduct);
   }, []);
 
   async function getProducts() {
     try {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .limit(10);
+      const { data, error } = await supabase.from("products").select("*");
+      //.limit(10);
       if (error) throw error;
       if (data != null) {
         setProducts(data);
@@ -38,7 +35,7 @@ export default function ProductHome() {
 
   async function createProduct() {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("products")
         .insert({
           name: name,
@@ -47,10 +44,11 @@ export default function ProductHome() {
         .single();
 
       if (error) throw error;
+      toast.success("Product created successfully!");
       window.location.reload();
     } catch (error) {
       const errorMessage = (error as Error).message;
-      alert(errorMessage);
+      toast.error(`Error: ${errorMessage}`);
     }
   }
 
@@ -64,7 +62,7 @@ export default function ProductHome() {
             </div>
             <div className="flex items-center">
               <span className="text-sm text-gray-500">
-                Created by Cooper Codes
+                Inspired by Cooper Codes
               </span>
             </div>
           </div>
