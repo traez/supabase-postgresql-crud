@@ -1,5 +1,5 @@
 {
-  "name": "chingu-techstack-practice",
+  "name": "supabase-postgresql-crud",
   "version": "0.1.0",
   "private": true,
   "scripts": {
