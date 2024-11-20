@@ -15,7 +15,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   async function updateProduct() {
     try {
       const { error } = await supabase
-        .from("products")
+        .from("s2products")
         .update({
           name: name,
           description: description,
@@ -34,7 +34,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   async function deleteProduct() {
     try {
       const { error } = await supabase
-        .from("products")
+        .from("s2products")
         .delete()
         .eq("id", product.id);
 

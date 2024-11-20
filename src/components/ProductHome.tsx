@@ -21,7 +21,7 @@ export default function ProductHome() {
 
   async function getProducts() {
     try {
-      const { data, error } = await supabase.from("products").select("*");
+      const { data, error } = await supabase.from("s2products").select("*");
       //.limit(10);
       if (error) throw error;
       if (data != null) {
@@ -36,7 +36,7 @@ export default function ProductHome() {
   async function createProduct() {
     try {
       const { error } = await supabase
-        .from("products")
+        .from("s2products")
         .insert({
           name: name,
           description: description,
