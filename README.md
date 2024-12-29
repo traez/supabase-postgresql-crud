@@ -62,6 +62,8 @@ Under the Supabase Free plan, you can have a maximum of 2 active projects at any
 In contrast, the Amazon RDS Free Tier (which i used for MySQL) benefits are available only for 12 months after signing up for AWS. Additionally, they tend to charge monthly with hidden costs, as you must sign up with a debit card (similar to Google’s approach). 
 - **Direct Database Interaction with Supabase SDK in Next.js**  
 In a Next.js app using the Supabase SDK, CRUD functionality can bypass traditional API routes or server actions. The SDK allows direct interaction with the database via client-side or server-side calls. This is secure when used correctly with Supabase's built-in features, such as Row-Level Security (RLS) and token-based authentication, which enforce access control directly at the database level. This eliminates the need for custom API layers while maintaining security, especially in apps designed to leverage Supabase's real-time capabilities and client-friendly architecture.  
+- **Implementing Real-Time Updates and Enabling RLS in Supabase**  
+In this project, I integrated real-time updates using Supabase, allowing seamless data synchronization between the frontend and database. This ensures users see changes instantly without needing to reload the page. Additionally, I enabled Row-Level Security (RLS) for the "Public" role to secure data access by defining precise access policies for different user roles. This ensures that only authorized users can access or modify specific data, enhancing the app's security and maintaining user privacy.  
 
 ### Continued development
 
