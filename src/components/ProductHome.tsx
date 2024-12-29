@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import ProductCard from "./ProductCard";
 import { supabase } from "@/lib/supabaseClient";
 import { DataTypeProduct } from "@/lib/dataProduct";
@@ -17,6 +18,23 @@ export default function ProductHome() {
   useEffect(() => {
     getProducts();
     //setProducts(arrayProduct);
+
+      // Subscribe to realtime updates
+    const channel = supabase
+    .channel("realtime:s2products")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "s2products" },
+      (payload: RealtimePostgresChangesPayload<DataTypeProduct>) => {
+        handleRealtimeUpdate(payload);
+      }
+    )
+    .subscribe();
+
+  // Cleanup subscription on component unmount
+  return () => {
+    supabase.removeChannel(channel);
+  };
   }, []);
 
   async function getProducts() {
@@ -33,6 +51,27 @@ export default function ProductHome() {
     }
   }
 
+  function handleRealtimeUpdate(
+    payload: RealtimePostgresChangesPayload<DataTypeProduct>
+  ) {
+    if (payload.eventType === "INSERT" && payload.new) {
+      const newProduct = payload.new as DataTypeProduct;
+      setProducts((prev) => [...prev, newProduct]);
+    } else if (payload.eventType === "UPDATE" && payload.new) {
+      const updatedProduct = payload.new as DataTypeProduct;
+      setProducts((prev) =>
+        prev.map((product) =>
+          product.id === updatedProduct.id ? updatedProduct : product
+        )
+      );
+    } else if (payload.eventType === "DELETE" && payload.old) {
+      const deletedProduct = payload.old as DataTypeProduct;
+      setProducts((prev) =>
+        prev.filter((product) => product.id !== deletedProduct.id)
+      );
+    }
+  }
+  
   async function createProduct() {
     try {
       const { error } = await supabase
